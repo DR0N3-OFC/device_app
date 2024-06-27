@@ -1,0 +1,135 @@
+version: "3.9"
+
+services:
+    react:
+        container_name: react
+        image: react
+        restart: always
+        build:
+            context: ./device_app_react/device_app
+            dockerfile: Dockerfile
+        environment:
+            - REACT_APP_RABBITMQ_PORT=3002
+            - PORT=3001
+        ports:
+            - "3001:3001"
+        depends_on:
+            - spring
+
+    express:
+        container_name: express
+        image: express
+        restart: always
+        environment:
+            - MONGODB_URI=mongodb://mongo:27017/device_api
+        build:
+            context: ./device_api_express/deviceapi
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo
+
+    spring:
+        container_name: spring
+        image: spring
+        restart: always
+        build:
+            context: ./device_api_spring/deviceapi
+            dockerfile: Dockerfile
+        environment:
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/device_api
+            - SPRING_DATASOURCE_USERNAME=postgres
+            - SPRING_DATASOURCE_PASSWORD=postgres
+        ports:
+            - "8080:8080"
+        depends_on:
+            - postgres
+            - rabbitmq
+
+    nginx:
+        image: nginx
+        container_name: nginx
+        ports:
+            - "80:80"
+        volumes: 
+            - ./device_api_nginx_gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - react
+            - spring
+            - express
+
+    postgres:
+        image: postgres:latest
+        container_name: postgres
+        ports:
+            - "5432:5432"
+        environment:
+          POSTGRES_DB: device_api
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        volumes:
+            - postgres_volume:/var/lib/postgresql/data
+    
+    mongo:
+        image: mongo:latest
+        container_name: mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo_volume:/data/db
+    
+    rabbitmq_consumer:
+        image: rabbitmq_consumer
+        container_name: rabbitmq_consumer
+        build:
+            context: ./rabbitmq_consumer
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "3002:3002"
+        environment:
+            - MONGODB_URI=mongodb://mongo:27017/messages
+            - QUEUE=device-queue
+            - PORT=3002
+        depends_on:
+            - mongo
+            - rabbitmq
+    
+    rabbitmq:
+        image: rabbitmq:3.12.14-management
+        container_name: rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+    
+    # jenkins:
+    #     image: jenkins/jenkins:lts
+    #     restart: always
+    #     privileged: true
+    #     user: root
+    #     tty: true
+    #     stdin_open: true
+    #     container_name: jenkins
+    #     ports:
+    #         - "8081:8080"
+    #         - "50000:50000"
+    #     volumes:
+    #         - jenkins_home:/var/jenkins_home
+    #         - /var/run/docker.sock:/var/run/docker.sock
+    #         - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+    #         - /usr/bin/docker:/usr/bin/docker
+    #     build:
+    #         context: ./device_project_jenkins
+    #         dockerfile: Dockerfile
+
+volumes:
+    postgres_volume:
+        driver: local
+    mongo_volume:
+        driver: local
+    # jenkins_home:
+    #     driver: local

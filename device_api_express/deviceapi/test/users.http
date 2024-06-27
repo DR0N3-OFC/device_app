@@ -1,0 +1,39 @@
+@url=http://localhost:3000/users
+
+### CRIAR
+POST {{url}}
+Content-Type: application/json
+
+{
+    "name": "Juca",
+    "email": "j@gmail.com",
+    "password": "1234",
+    "birth": "2000-01-01"
+}
+
+
+### GET ALL
+GET {{url}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDk1ZTdmNmY2MjZiNGRiZTQ3Mjg4NCIsImlhdCI6MTcxNjA4NDc1MSwiZXhwIjoxNzE2MDg4MzUxfQ.SY7JFgK3rrUbTrC-_eUZ7-VWv9vibhCQWflBwOlSQvI
+
+### Get by ID
+GET {{url}}/6335ee8ce8a9c74c2085aca1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDk1ZTdmNmY2MjZiNGRiZTQ3Mjg4NCIsImlhdCI6MTcxNjA4NDc1MSwiZXhwIjoxNzE2MDg4MzUxfQ.SY7JFgK3rrUbTrC-_eUZ7-VWv9vibhCQWflBwOlSQvI
+
+### Edit
+PUT {{url}}/664961d004db2f75fa5271c6
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDk2MWQwMDRkYjJmNzVmYTUyNzFjNiIsImlhdCI6MTcxNjA4ODQwMSwiZXhwIjoxNzE2MDkyMDAxfQ.u3rEuZdIEJxfjyCNLA8IPw1moMDwES_I2okxOODel5Y
+
+{
+    "name": "Jacu",
+    "email": "j@gmail.com",
+    "password": "1234",
+    "birth": "2000-01-01T00:00:00.000Z",
+    "createdAt": "2024-05-19T02:20:00.010Z",
+    "updatedAt": "2024-05-19T02:20:00.010Z"
+}
+
+### Delete
+DELETE  {{url}}/66493d515446cf396571c0cc
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NDk2MWQwMDRkYjJmNzVmYTUyNzFjNiIsImlhdCI6MTcxNjA4ODQwMSwiZXhwIjoxNzE2MDkyMDAxfQ.u3rEuZdIEJxfjyCNLA8IPw1moMDwES_I2okxOODel5Y
