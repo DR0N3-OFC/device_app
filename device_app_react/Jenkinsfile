@@ -37,13 +37,15 @@ pipeline {
     stage('Start container') {
       steps {
         sh '''
-          cd deviceapi
+          cd device_app
           
           docker build -t react:latest .
           
           docker run -d \
-          -p 3001:3000 \
+          -p 3001:3001 \
           --name react \
+          -e REACT_APP_RABBITMQ_PORT=3002 \
+          -e PORT=3001 \
           react:latest
           
           docker ps

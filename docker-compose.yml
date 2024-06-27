@@ -3,7 +3,7 @@ version: "3.9"
 services:
     react:
         container_name: react
-        image: react
+        image: react:latest
         restart: always
         build:
             context: ./device_app_react/device_app
@@ -18,7 +18,7 @@ services:
 
     express:
         container_name: express
-        image: express
+        image: express:latest
         restart: always
         environment:
             - MONGODB_URI=mongodb://mongo:27017/device_api
@@ -32,7 +32,7 @@ services:
 
     spring:
         container_name: spring
-        image: spring
+        image: spring:latest
         restart: always
         build:
             context: ./device_api_spring/deviceapi
