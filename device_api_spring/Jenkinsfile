@@ -3,54 +3,105 @@ pipeline {
   stages {
     stage("setup environment") {
       steps {
-        sh '''
-          docker version
-          docker-compose version
-          docker info
-          curl --version
-        '''
+        script {
+          if (isUnix()) {
+            sh '''
+              docker version
+              docker-compose version
+              docker info
+              curl --version
+            '''
+          } else {
+            bat '''
+              docker version
+              docker-compose version
+              docker info
+              curl --version
+            '''
+          }
+        }
       }
     }
     stage('Prune Docker data') {
       steps {
-          // Check if the container exists
-          sh """
-          if [ \$(docker ps -a -q -f name=spring) ]; then
-              echo "Removing container 'spring'..."
-              docker rm -f 'spring'
-          else
-              echo "Container 'spring' does not exist."
-          fi
-          """
-  
-          // Check if the image exists
-          sh """
-          if [ \$(docker images -q spring:latest) ]; then
-              echo "Removing image 'spring:latest'..."
-              docker rmi -f spring:latest
-          else
-              echo "Image 'spring:latest' does not exist."
-          fi
-          """
+        script {
+          if (isUnix()) {
+            sh '''
+              if [ $(docker ps -a -q -f name=spring) ]; then
+                  echo "Removing container 'spring'..."
+                  docker rm -f 'spring'
+              else
+                  echo "Container 'spring' does not exist."
+              fi
+
+              if [ $(docker images -q spring:latest) ]; then
+                  echo "Removing image 'spring:latest'..."
+                  docker rmi -f spring:latest
+              else
+                  echo "Image 'spring:latest' does not exist."
+              fi
+            '''
+          } else {
+            bat '''
+                docker ps -a -q -f name=spring > nul 
+                if %ERRORLEVEL% == 0 (
+                    echo "Removing container 'spring'..."
+                    docker rm -f spring
+                ) else (
+                    echo "Container 'spring' does not exist."
+                )
+
+                docker images -q spring:latest >nul 
+                if %ERRORLEVEL% == 0 (
+                    echo "Removing image 'spring:latest'..."
+                    docker rmi -f spring:latest
+                ) else (
+                    echo "Image 'spring:latest' does not exist."
+                )
+            '''
+          }
+        }
       }
     }
     stage('Start container') {
       steps {
-        sh '''
-          cd deviceapi
-          
-          docker build -t spring:latest .
-          
-          docker run -d \
-          -p 8080:8080 \
-          --name spring \
-          -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/device_api \
-          -e SPRING_DATASOURCE_USERNAME=postgres \
-          -e SPRING_DATASOURCE_PASSWORD=postgres \
-          spring:latest
-          
-          docker ps
-        '''
+        script {
+          if (isUnix()) {
+            sh '''
+              cd deviceapi
+              
+              docker build -t spring:latest .
+              
+              docker run -d \
+              -p 8080:8080 \
+              --name spring \
+              --network tac_default \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/device_api \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=postgres \
+              spring:latest
+              
+              docker ps
+            '''
+          } else {
+              bat '''
+                cd deviceapi
+              
+                docker build -t spring:latest .
+                
+                docker run -d ^
+                -p 8080:8080 ^
+                --name spring ^
+                --network tac_default ^
+                -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/device_api ^
+                -e SPRING_DATASOURCE_USERNAME=postgres ^
+                -e SPRING_DATASOURCE_PASSWORD=postgres ^
+                spring:latest
+                
+                docker ps
+              '''
+          }
+        }
       }
     }
   }

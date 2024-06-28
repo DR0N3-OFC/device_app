@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const Messages = () => {
     const { loggedIn } = useAuth();
     const [messages, setMessages] = useState([]);
-    const navigate = useNavigate();
+    const nav = useNavigate();
 
     useEffect(() => {
        if (!loggedIn) {
