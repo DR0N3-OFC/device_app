@@ -102,6 +102,23 @@ pipeline {
                 }
             }
         }
+        stage('Restart nginx container') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            echo "Restarting container 'nginx'..."
+                            docker restart nginx
+                        '''
+                    } else {
+                        bat '''
+                            echo "Restarting container 'nginx'..."
+                            docker restart nginx
+                        '''
+                    }
+                }
+            }
+        }
     }
     post {
         success {

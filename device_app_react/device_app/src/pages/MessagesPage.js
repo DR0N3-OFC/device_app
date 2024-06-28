@@ -6,13 +6,13 @@ import { useNavigate } from 'react-router-dom';
 const Messages = () => {
     const { loggedIn } = useAuth();
     const [messages, setMessages] = useState([]);
-    const nav = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
        if (!loggedIn) {
-           nav('/login');
+           navigate('/login');
        }
-    }, [loggedIn, nav]);
+    }, [loggedIn, navigate]);
 
     useEffect(() => {
         async function fetchMessages() {
